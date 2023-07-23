@@ -1,5 +1,8 @@
 #! /usr/bin/env node
 
+// https://acoustid.org/webservice
+const ACOUSTID_CLIENT = 'jicaZSwBYAU'
+
 // fingerprint
 // https://acoustid.org/fingerprint/48005565
 
@@ -76,15 +79,16 @@ async function query (url, query) {
  */
 async function listRecordingIdsByTrackId (trackId) {
   const result = await query('https://api.acoustid.org/v2/lookup', {
-    client: 'Gp4IuWk1QAQ',
+    client: ACOUSTID_CLIENT,
     trackid: trackId,
     meta: 'recordings'
   })
-  if (result != null) {
+  if (result != null && result.results != null) {
     return result.results[0].recordings.map(recording => {
       recording.id
     })
   }
+  console.error(result)
 }
 
 /**
@@ -101,6 +105,7 @@ async function listRecordingIdsByTrackId (trackId) {
  */
 async function listTrackIdsByRecordingId (recordingId) {
   const result = await query('https://api.acoustid.org/v2/track/list_by_mbid', {
+    client: ACOUSTID_CLIENT,
     mbid: recordingId
   })
   if (result != null && result.tracks != null) {
