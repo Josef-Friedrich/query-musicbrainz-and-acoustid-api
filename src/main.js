@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
-// https://acoustid.org/webservice
-const ACOUSTID_CLIENT = 'jicaZSwBYAU'
+// https://acoustid.org/my-applications
+const ACOUSTID_CLIENT = "b'W4yoQRdE"
 
 // fingerprint
 // https://acoustid.org/fingerprint/48005565
@@ -144,11 +144,13 @@ async function openAcoustIdWithMultipleRecordings (releaseId) {
   const recordingIds = await listRecordingIdsByReleaseId(releaseId)
   const intervalId = setInterval(async () => {
     const recordingId = recordingIds.pop()
+    console.log(recordingId)
     if (recordingId != null) {
       const trackIds = await listTrackIdsByRecordingId(recordingId)
       if (trackIds.length === 1) {
         const result = await listRecordingIdsByTrackId(trackIds[0])
         if (result.length > 1) {
+          console.log('Found multiple records')
           openUrl(`https://acoustid.org/track/${trackIds[0]}`)
         }
       }
