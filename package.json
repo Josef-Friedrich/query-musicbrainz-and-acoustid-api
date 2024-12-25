@@ -2,13 +2,16 @@
   "name": "query-musicbrainz-and-acoustid-api",
   "version": "0.1.0",
   "description": "Query the MusicBrainz and AcoustID API",
-  "main": "acoustid.api.js",
+  "main": "./src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "musicbrainz-api": "^0.10.3"
+    "musicbrainz-api": "^0.19.1"
+  },
+  "bin": {
+    "musicbrainz.js": "./src/main.js"
   }
 }
