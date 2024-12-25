@@ -1,5 +1,7 @@
 #! /usr/bin/env node
 
+import config from '/etc/musicbrainz.json' with { type: 'json' }
+
 // https://acoustid.org/my-applications
 const ACOUSTID_CLIENT = "b'W4yoQRdE"
 
@@ -79,7 +81,7 @@ export async function listRecordingIdsByTrackId(
   trackId: string
 ): Promise<string[] | undefined> {
   const result = await query('https://api.acoustid.org/v2/lookup', {
-    client: ACOUSTID_CLIENT,
+    client: config.acoustId.apiKey,
     trackid: trackId,
     meta: 'recordings'
   })
