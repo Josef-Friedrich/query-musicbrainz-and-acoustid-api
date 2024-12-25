@@ -4,12 +4,17 @@
   "description": "Query the MusicBrainz and AcoustID API",
   "main": "./src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
-  "author": "",
+  "type": "module",
+  "author": "Josef Friedrich",
   "license": "ISC",
   "dependencies": {
     "musicbrainz-api": "^0.19.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "@types/node": "22.10.2"
   },
   "bin": {
     "musicbrainz.js": "./src/main.js"
