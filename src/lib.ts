@@ -2,9 +2,6 @@
 
 import config from '/etc/musicbrainz.json' with { type: 'json' }
 
-// https://acoustid.org/my-applications
-const ACOUSTID_CLIENT = "b'W4yoQRdE"
-
 // fingerprint
 // https://acoustid.org/fingerprint/48005565
 
@@ -28,7 +25,7 @@ function openUrl(url: string): void {
 const mbApi = new MusicBrainzApi({
   appName: 'queryReleases',
   appVersion: '0.1.0',
-  appContactInfo: 'josef@friedrich.rocks'
+  appContactInfo: config.musicbrainz.contactEmail
 })
 
 async function query(url: string, query: Record<string, string>): Promise<any> {
@@ -81,6 +78,7 @@ export async function listRecordingIdsByTrackId(
   trackId: string
 ): Promise<string[] | undefined> {
   const result = await query('https://api.acoustid.org/v2/lookup', {
+    // https://acoustid.org/my-applications
     client: config.acoustId.apiKey,
     trackid: trackId,
     meta: 'recordings'
@@ -111,7 +109,7 @@ export async function listTrackIdsByRecordingId(
   recordingId: string
 ): Promise<string[]> {
   const result = await query('https://api.acoustid.org/v2/track/list_by_mbid', {
-    client: ACOUSTID_CLIENT,
+    client: config.acoustId.apiKey,
     mbid: recordingId
   })
   if (result != null && result.tracks != null) {
@@ -144,7 +142,7 @@ export async function listRecordingIdsByReleaseId(
 /**
  * @param releaseId - For example `70d0009e-3b8d-4e03-ab41-2beb34a2c546`
  */
-async function openAcoustIdWithMultipleRecordings(
+export async function openAcoustIdWithMultipleRecordings(
   releaseId: string
 ): Promise<void> {
   const recordingIds = await listRecordingIdsByReleaseId(releaseId)
@@ -164,15 +162,4 @@ async function openAcoustIdWithMultipleRecordings(
       clearInterval(intervalId)
     }
   }, 300)
-}
-
-const isMainModule = import.meta.url.endsWith(process.argv[1])
-
-if (isMainModule) {
-  if (process.argv.length < 3) {
-    console.log(`Usage: ${process.argv[1]} <musicbrainz-release-id>`)
-    process.exit(1)
-  }
-
-  openAcoustIdWithMultipleRecordings(process.argv[2])
 }

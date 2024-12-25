@@ -8,8 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// https://acoustid.org/my-applications
-const ACOUSTID_CLIENT = "b'W4yoQRdE";
+import config from '/etc/musicbrainz.json' with { type: 'json' };
 // fingerprint
 // https://acoustid.org/fingerprint/48005565
 // track ID: a cluster of fingerprints.
@@ -29,7 +28,7 @@ function openUrl(url) {
 const mbApi = new MusicBrainzApi({
     appName: 'queryReleases',
     appVersion: '0.1.0',
-    appContactInfo: 'josef@friedrich.rocks'
+    appContactInfo: config.musicbrainz.contactEmail
 });
 function query(url, query) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -81,13 +80,14 @@ function query(url, query) {
 export function listRecordingIdsByTrackId(trackId) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = yield query('https://api.acoustid.org/v2/lookup', {
-            client: ACOUSTID_CLIENT,
+            // https://acoustid.org/my-applications
+            client: config.acoustId.apiKey,
             trackid: trackId,
             meta: 'recordings'
         });
         if (result != null && result.results != null) {
             return result.results[0].recordings.map((recording) => {
-                recording.id;
+                return recording.id;
             });
         }
         console.error(result);
@@ -103,10 +103,10 @@ export function listRecordingIdsByTrackId(trackId) {
  *
  * @param recordingId - For example `70d0009e-3b8d-4e03-ab41-2beb34a2c546`
  */
-function listTrackIdsByRecordingId(recordingId) {
+export function listTrackIdsByRecordingId(recordingId) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = yield query('https://api.acoustid.org/v2/track/list_by_mbid', {
-            client: ACOUSTID_CLIENT,
+            client: config.acoustId.apiKey,
             mbid: recordingId
         });
         if (result != null && result.tracks != null) {
@@ -138,7 +138,7 @@ export function listRecordingIdsByReleaseId(releaseId) {
 /**
  * @param releaseId - For example `70d0009e-3b8d-4e03-ab41-2beb34a2c546`
  */
-function openAcoustIdWithMultipleRecordings(releaseId) {
+export function openAcoustIdWithMultipleRecordings(releaseId) {
     return __awaiter(this, void 0, void 0, function* () {
         const recordingIds = yield listRecordingIdsByReleaseId(releaseId);
         const intervalId = setInterval(() => __awaiter(this, void 0, void 0, function* () {
@@ -159,12 +159,4 @@ function openAcoustIdWithMultipleRecordings(releaseId) {
             }
         }), 300);
     });
-}
-const isMainModule = import.meta.url.endsWith(process.argv[1]);
-if (isMainModule) {
-    if (process.argv.length < 3) {
-        console.log(`Usage: ${process.argv[1]} <musicbrainz-release-id>`);
-        process.exit(1);
-    }
-    openAcoustIdWithMultipleRecordings(process.argv[2]);
 }

@@ -4,7 +4,7 @@ import {
   listRecordingIdsByTrackId,
   listTrackIdsByRecordingId,
   listRecordingIdsByReleaseId
-} from './main.js'
+} from './lib.js'
 
 test('Method: listRecordingIdsByTrackId()', async () => {
   // https://acoustid.org/track/4ca004ee-4247-4cf3-b1d2-1138531b747a
