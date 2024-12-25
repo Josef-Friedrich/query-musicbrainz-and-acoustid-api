@@ -75,7 +75,9 @@ async function query(url: string, query: Record<string, string>): Promise<any> {
  * }
  * ```
  */
-async function listRecordingIdsByTrackId(trackId: string) {
+export async function listRecordingIdsByTrackId(
+  trackId: string
+): Promise<string[] | undefined> {
   const result = await query('https://api.acoustid.org/v2/lookup', {
     client: ACOUSTID_CLIENT,
     trackid: trackId,
@@ -83,7 +85,7 @@ async function listRecordingIdsByTrackId(trackId: string) {
   })
   if (result != null && result.results != null) {
     return result.results[0].recordings.map((recording: Id) => {
-      recording.id
+      return recording.id
     })
   }
   console.error(result)
@@ -103,7 +105,7 @@ interface Id {
  *
  * @param recordingId - For example `70d0009e-3b8d-4e03-ab41-2beb34a2c546`
  */
-async function listTrackIdsByRecordingId(
+export async function listTrackIdsByRecordingId(
   recordingId: string
 ): Promise<string[]> {
   const result = await query('https://api.acoustid.org/v2/track/list_by_mbid', {
@@ -119,12 +121,12 @@ async function listTrackIdsByRecordingId(
 }
 
 /**
- *
+ * Spielpläne 5/6 (Ausgabe Bayern 2004)
  * https://musicbrainz.org/release/70d0009e-3b8d-4e03-ab41-2beb34a2c546
  *
  * @param releaseId - For example `70d0009e-3b8d-4e03-ab41-2beb34a2c546`
  */
-async function listRecordingIdsByReleaseId(
+export async function listRecordingIdsByReleaseId(
   releaseId: string
 ): Promise<string[]> {
   const release = await mbApi.lookup('release', releaseId, ['recordings'])
@@ -151,7 +153,7 @@ async function openAcoustIdWithMultipleRecordings(
       const trackIds = await listTrackIdsByRecordingId(recordingId)
       if (trackIds.length === 1) {
         const result = await listRecordingIdsByTrackId(trackIds[0])
-        if (result.length > 1) {
+        if (result != null && result.length > 1) {
           console.log('Found multiple records')
           openUrl(`https://acoustid.org/track/${trackIds[0]}`)
         }
@@ -162,9 +164,13 @@ async function openAcoustIdWithMultipleRecordings(
   }, 300)
 }
 
-if (process.argv.length < 3) {
-  console.log(`Usage: ${process.argv[1]} <musicbrainz-release-id>`)
-  process.exit(1)
-}
+const isMainModule = import.meta.url.endsWith(process.argv[1])
 
-openAcoustIdWithMultipleRecordings(process.argv[2])
+if (isMainModule) {
+  if (process.argv.length < 3) {
+    console.log(`Usage: ${process.argv[1]} <musicbrainz-release-id>`)
+    process.exit(1)
+  }
+
+  openAcoustIdWithMultipleRecordings(process.argv[2])
+}

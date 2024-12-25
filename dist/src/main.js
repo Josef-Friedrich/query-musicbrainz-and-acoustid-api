@@ -78,7 +78,7 @@ function query(url, query) {
  * }
  * ```
  */
-function listRecordingIdsByTrackId(trackId) {
+export function listRecordingIdsByTrackId(trackId) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = yield query('https://api.acoustid.org/v2/lookup', {
             client: ACOUSTID_CLIENT,
@@ -118,12 +118,12 @@ function listTrackIdsByRecordingId(recordingId) {
     });
 }
 /**
- *
+ * Spielpläne 5/6 (Ausgabe Bayern 2004)
  * https://musicbrainz.org/release/70d0009e-3b8d-4e03-ab41-2beb34a2c546
  *
  * @param releaseId - For example `70d0009e-3b8d-4e03-ab41-2beb34a2c546`
  */
-function listRecordingIdsByReleaseId(releaseId) {
+export function listRecordingIdsByReleaseId(releaseId) {
     return __awaiter(this, void 0, void 0, function* () {
         const release = yield mbApi.lookup('release', releaseId, ['recordings']);
         const recordingIds = [];
@@ -148,7 +148,7 @@ function openAcoustIdWithMultipleRecordings(releaseId) {
                 const trackIds = yield listTrackIdsByRecordingId(recordingId);
                 if (trackIds.length === 1) {
                     const result = yield listRecordingIdsByTrackId(trackIds[0]);
-                    if (result.length > 1) {
+                    if (result != null && result.length > 1) {
                         console.log('Found multiple records');
                         openUrl(`https://acoustid.org/track/${trackIds[0]}`);
                     }
@@ -160,8 +160,11 @@ function openAcoustIdWithMultipleRecordings(releaseId) {
         }), 300);
     });
 }
-if (process.argv.length < 3) {
-    console.log(`Usage: ${process.argv[1]} <musicbrainz-release-id>`);
-    process.exit(1);
+const isMainModule = import.meta.url.endsWith(process.argv[1]);
+if (isMainModule) {
+    if (process.argv.length < 3) {
+        console.log(`Usage: ${process.argv[1]} <musicbrainz-release-id>`);
+        process.exit(1);
+    }
+    openAcoustIdWithMultipleRecordings(process.argv[2]);
 }
-openAcoustIdWithMultipleRecordings(process.argv[2]);
